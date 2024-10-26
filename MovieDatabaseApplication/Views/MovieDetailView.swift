@@ -10,9 +10,10 @@ import SwiftUI
 // MARK: - MovieDetailView
 struct MovieDetailView: View {
     let movie: Movie
+    @State var isMovieAnalysisOpen: Bool = false
     
     var body: some View {
-        HStack {
+        HStack(alignment: .top) {
             AsyncImage(url: URL(string: movie.poster)) { image in
                 image
                     .resizable()
@@ -39,5 +40,11 @@ struct MovieDetailView: View {
                     .foregroundColor(.black.opacity(0.9))
             }
         }
+        .onTapGesture {
+            isMovieAnalysisOpen.toggle()
+        }
+        .sheet(isPresented: $isMovieAnalysisOpen, content: {
+            MovieInsightsView(movie: movie)
+        })
     }
 }
