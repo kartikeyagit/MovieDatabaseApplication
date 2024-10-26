@@ -11,7 +11,7 @@ import SwiftUI
 struct MovieDatabaseApplicationApp: App {
     var body: some Scene {
         WindowGroup {
-            MovieDatabase()
+            MovieDatabaseView()
         }
     }
 }
