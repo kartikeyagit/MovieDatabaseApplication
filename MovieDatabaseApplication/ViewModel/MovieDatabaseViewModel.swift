@@ -21,11 +21,15 @@ class MovieDatabaseViewModel: ObservableObject {
             let data = try Data(contentsOf: url)
             let decoder = JSONDecoder()
             let decodedData = try decoder.decode(Movies.self, from: data)
-            self.movies = decodedData
-            self.isLoading = false
+            DispatchQueue.main.async {
+                self.movies = decodedData
+                self.isLoading = false
+            }
         } catch {
-            isLoading = false
-            print("Error loading JSON: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+                self.isLoading = false
+                print("Error loading JSON: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -59,7 +63,7 @@ class MovieDatabaseViewModel: ObservableObject {
         var uniqueYears: Set<String> = []
         
         for movie in movies {
-            let years = movie.year.split(separator: "-").map { $0.trimmingCharacters(in: .whitespaces) }
+            let years = movie.year.split(separator: "–").map { $0.trimmingCharacters(in: .whitespaces) }
             
             if years.count > 1, let startYear = Int(years[0]), let endYear = Int(years[1]) {
                 for year in startYear...endYear {
@@ -75,7 +79,7 @@ class MovieDatabaseViewModel: ObservableObject {
     
     func extractSubCategory<Value: StringProtocol>(
         keyPath: KeyPath<Movie, Value>,
-        from movies: [Movie]
+        from movies: Movies
     ) -> [String] {
         var uniqueSubCategories: Set<String> = []
 
@@ -83,9 +87,10 @@ class MovieDatabaseViewModel: ObservableObject {
             let data = movie[keyPath: keyPath]
             let subCategories = data.split { $0 == "," || $0 == "-" }
                 .map { $0.trimmingCharacters(in: .whitespaces) }
-            uniqueSubCategories.formUnion(subCategories)
+            let filteredSubcategories = subCategories.filter({$0 != "N/A"})
+            uniqueSubCategories.formUnion(filteredSubcategories)
         }
         
         return Array(uniqueSubCategories).sorted()
-    }    
+    }
 }

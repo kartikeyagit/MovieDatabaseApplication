@@ -10,63 +10,81 @@ import SwiftUI
 struct MovieInsightsView: View {
     var movie: Movie
     @State private var selectedRatingSource: RatingSource = .imdb
-
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if let posterURL = URL(string: movie.poster) {
-                    AsyncImage(url: posterURL) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: 300)
-                            .cornerRadius(10)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    } placeholder: {
-                        ProgressView()
-                            .frame(height: 300)
+                    AsyncImage(url: posterURL) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 300)
+                                .cornerRadius(10)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else if phase.error != nil {
+                            Image(systemName: "photo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 300)
+                                .scaleEffect(0.2)
+                                .foregroundColor(.gray)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        } else {
+                            ProgressView()
+                                .frame(height: 300)
+                                .tint(.white)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                        }
                     }
                 }
-
+                
                 Text(movie.title)
                     .font(.title)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-
+                
                 Text(movie.plot)
                     .font(.body)
                     .foregroundColor(.gray)
-
-                Text("Cast & Crew:")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                Text(movie.actors)
-                    .font(.body)
-                    .foregroundColor(.gray)
-
+                
+                if movie.actors != "N/A" {
+                    Text("Cast & Crew:")
+                        .font(.headline)
+                        .foregroundColor(.white)
+                    Text(movie.actors)
+                        .font(.body)
+                        .foregroundColor(.gray)
+                }
+                
                 Text("Released: \(movie.released)")
                     .font(.body)
                     .foregroundColor(.gray)
-
+                
                 Text("Genre: \(movie.genre)")
                     .font(.body)
                     .foregroundColor(.gray)
-
+                
                 VStack {
                     Text("Rating")
                         .font(.headline)
                         .foregroundColor(.white)
                     
-                    SegmentedTabView(selectedTab: $selectedRatingSource, underlineColor: .yellow)
+                    SegmentedTabView(selectedTab: $selectedRatingSource, movie: movie, underlineColor: .yellow)
                         .padding(.leading)
                     
-                    Text("Rating: \(getRatingValue(for: selectedRatingSource))")
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
+                    HStack(spacing: 5) {
+                        Text("Rating:")
+                            .foregroundColor(.white)
+                        Text("\(getRatingValue(for: selectedRatingSource))")
+                            .foregroundColor(.yellow)
+                    }
+                    .font(.title2)
+                    .fontWeight(.bold)
                 }
                 .padding(.top)
-
+                
                 Spacer()
             }
             .padding()
@@ -76,7 +94,7 @@ struct MovieInsightsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .foregroundColor(.white)
     }
-
+    
     private func getRatingValue(for source: RatingSource) -> String {
         switch source {
         case .imdb:

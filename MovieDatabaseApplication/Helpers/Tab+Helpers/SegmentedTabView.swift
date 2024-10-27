@@ -9,8 +9,12 @@ import SwiftUI
 
 struct SegmentedTabView: View {
     @Binding var selectedTab: RatingSource
-    @State var segmentTabItems: [RatingSource] = RatingSource.allCases
+    var movie: Movie
     @State var underlineColor: Color
+    
+    private var segmentTabItems: [RatingSource] {
+        RatingSource.allCases.filter { !getRatingValue(for: $0).isEmpty && getRatingValue(for: $0) != "N/A" }
+    }
     
     var body: some View {
         ScrollViewReader { scrollViewProxy in
@@ -49,6 +53,19 @@ struct SegmentedTabView: View {
                     scrollViewProxy.scrollTo(newValue, anchor: .center)
                 }
             }
+        }
+    }
+    
+    private func getRatingValue(for source: RatingSource) -> String {
+        switch source {
+        case .imdb:
+            return movie.imdbRating
+        case .rottenTomatoes:
+            return movie.ratings.first(where: { $0.source.rawValue == "Rotten Tomatoes" })?.value ?? ""
+        case .metacritic:
+            return movie.ratings.first(where: { $0.source.rawValue == "Metacritic" })?.value ?? ""
+        case .internetMovieDatabase:
+            return movie.ratings.first(where: { $0.source.rawValue == "Internet Movie Database" })?.value ?? ""
         }
     }
 }
