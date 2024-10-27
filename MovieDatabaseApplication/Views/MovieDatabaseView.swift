@@ -52,7 +52,7 @@ struct MovieDatabaseView: View {
                                 }
                             }
                         }
-                        .background(Color(.lightGray).cornerRadius(12))
+                        .background(Color(.lightGray).opacity(0.15).cornerRadius(12))
                         .padding(.horizontal)
                         
                         Divider()
@@ -90,10 +90,8 @@ struct MovieDatabaseView: View {
                                         if selectedCategory == category {
                                             if category == .allMovies {
                                                 AllMoviesView(movies: viewModel.getMovies())
-                                                    .listRowBackground(Color.white)
                                             } else {
                                                 SubCategoryView(subCategories: viewModel.getSubCategories(for: category), searchString: $searchString)
-                                                    .listRowBackground(Color.white)
                                             }
                                         }
                                     }
@@ -128,23 +126,21 @@ struct MovieDatabaseView: View {
                                         .foregroundColor(.gray)
                                         .font(.headline)
                                         .padding()
-                                        .listRowBackground(Color.white)
                                 } else {
                                     ForEach(filteredMovies, id: \.imdbID) { movie in
                                         MovieDetailView(movie: movie)
-                                            .listRowBackground(Color.white)
                                     }
                                 }
                             }
                         }
                         .listStyle(.plain)
                         .padding(.horizontal)
+                        .preferredColorScheme(.light)
                     }
                 }
                 .onAppear {
                     viewModel.loadMovies()
                 }
-//                .padding()
             }
             .navigationTitle("Movie Database")
             .navigationBarTitleDisplayMode(.inline)
