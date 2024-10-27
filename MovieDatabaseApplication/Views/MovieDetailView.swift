@@ -42,12 +42,15 @@ struct MovieDetailView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Text(movie.title)
                         .font(.headline)
+                        .foregroundStyle(.black)
                     HStack(alignment: .top, spacing: 5) {
                         Text("Language:")
                             .font(.subheadline)
+                            .foregroundStyle(.black)
                         VStack(alignment: .leading) {
                             Text(movie.language)
                                 .font(.subheadline)
+                                .foregroundStyle(.black)
                         }
                     }
                     Text("Year: \(movie.year)")
